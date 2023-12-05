@@ -12,9 +12,9 @@ mysql = MySQL()
 # Configure MySQL
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''  # Replace with your MySQL password if set
-app.config['MYSQL_DB'] = 'tchokafew'  # Replace with your database name
-app.config['MYSQL_PORT'] = 3307  # Update the port to your MySQL port
+app.config['MYSQL_PASSWORD'] = ''  
+app.config['MYSQL_DB'] = 'tchokafew' 
+app.config['MYSQL_PORT'] = 3307  
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql.init_app(app)
@@ -35,11 +35,8 @@ def create_products_table():
 # Function to insert sample data into 'products' table
 def insert_sample_data():
     cur = mysql.connection.cursor()
-    # Insert sample data into the 'products' table
     cur.execute('INSERT INTO products (name, description, price, inventory) VALUES (%s, %s, %s, %s)', ('Product 1', 'Description of Product 1', 19.99, 100))
     cur.execute('INSERT INTO products (name, description, price, inventory) VALUES (%s, %s, %s, %s)', ('Product 2', 'Description of Product 2', 29.99, 50))
-    # Add more sample data as needed
-    # ...
 
     mysql.connection.commit()
     cur.close()
@@ -79,9 +76,6 @@ def checkout():
         product_id = request.form['product_id']
         quantity = request.form['quantity']
         # Process the order, update inventory, etc.
-        # You'll need to implement this part based on your business logic
-
-        # For example, updating inventory after an order is placed
         cur = mysql.connection.cursor()
         cur.execute('UPDATE products SET inventory = inventory - %s WHERE id = %s', (quantity, product_id))
         mysql.connection.commit()
