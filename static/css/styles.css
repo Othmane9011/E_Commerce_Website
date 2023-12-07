@@ -7,7 +7,36 @@ header {
     background-color: #333;
     color: white;
     padding: 10px 20px;
-    text-align: center;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    width: 100px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.button {
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: white;
+    background-color: #555;
+    border: none;
+    border-radius: 4px;
+}
+
+.button:hover {
+    background-color: #777;
 }
 footer {
     background-color: #333;
@@ -32,4 +61,31 @@ footer {
 }
 .product h2 {
     margin-top: 0;
+}
+
+#hero {
+    background-image: url('../images/case-sizes.jpg');
+    background-size: cover; 
+    background-position: center center;
+    color: white; 
+    text-align: center; 
+    padding: 100px 0; 
+}
+
+#hero h4 {
+    font-size: 24px; /* Adjust the font size as needed */
+    margin-bottom: 10px; /* Add space between elements */
+    font-weight: bold; /* Optionally, apply bold font weight */
+}
+
+#hero h2 {
+    font-size: 36px; /* Adjust the font size as needed */
+    margin-bottom: 20px; /* Add space between elements */
+    text-transform: uppercase; /* Convert text to uppercase */
+}
+
+#hero h1 {
+    font-size: 48px; /* Adjust the font size as needed */
+    margin-bottom: 30px; /* Add space between elements */
+    font-weight: bold; /* Optionally, apply bold font weight */
 }

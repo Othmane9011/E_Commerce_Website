@@ -1,14 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Product Listing</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Product Listing</h1>
-    </header>
+    <head>
+        <meta charset="UTF-8">
+        <title>Product Listing</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    </head>
+    <body>
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+                </div>
+                <div class="header-buttons">
+                    <a href="/shop" class="button">Shop</a>
+                    <a href="/cart" class="button">Cart</a>
+                </div>
+            </div>
+        </header>
+
+    <section id="hero">
+        <div>
+        <h4>Offer</h4>
+        <h2>Super deal</h2>
+        <h1>On this product</h1>
+        <p>Save 30% off !</p>
+        <a href="/products" class="button">Shop Now</a>
+        </div>
+    </section>
 
     <div class="container">
         {% for product in products %}
