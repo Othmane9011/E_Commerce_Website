@@ -73,19 +73,19 @@ footer {
 }
 
 #hero h4 {
-    font-size: 24px; /* Adjust the font size as needed */
-    margin-bottom: 10px; /* Add space between elements */
-    font-weight: bold; /* Optionally, apply bold font weight */
+    font-size: 24px; 
+    margin-bottom: 10px; 
+    font-weight: bold; 
 }
 
 #hero h2 {
-    font-size: 36px; /* Adjust the font size as needed */
-    margin-bottom: 20px; /* Add space between elements */
-    text-transform: uppercase; /* Convert text to uppercase */
+    font-size: 36px; 
+    margin-bottom: 20px; 
+    text-transform: uppercase; 
 }
 
 #hero h1 {
-    font-size: 48px; /* Adjust the font size as needed */
-    margin-bottom: 30px; /* Add space between elements */
-    font-weight: bold; /* Optionally, apply bold font weight */
+    font-size: 48px; 
+    margin-bottom: 30px; 
+    font-weight: bold; 
 }
