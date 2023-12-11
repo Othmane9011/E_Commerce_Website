@@ -28,6 +28,21 @@
         </div>
     </section>
 
+    <section class="features">
+        <div class="feature-box">
+            <img src="{{ url_for('static', filename='images/free-shipping.png') }}" alt="Free Shipping">
+            <h3>Free Shipping</h3>
+        </div>
+        <div class="feature-box">
+            <img src="{{ url_for('static', filename='images/online-order.png') }}" alt="Online Order">
+            <h3>Online Order</h3>
+        </div>
+        <div class="feature-box">
+            <img src="{{ url_for('static', filename='images/Support.png') }}" alt="24/7 Support">
+            <h3>24/7 Support</h3>
+        </div>
+    </section>
+
     <div class="container">
         {% for product in products %}
         <div class="product">
