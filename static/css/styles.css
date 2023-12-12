@@ -9,28 +9,9 @@ header {
     padding: 10px 20px;
 }
 
-.user-info {
-    display: flex;
-    align-items: center;
-}
 
-.user-info img {
-    width: 30px; /* Set width as needed */
-    height: auto; /* Maintain aspect ratio */
-    margin-right: 10px; /* Adjust margin as needed */
-}
 
-.user-details {
-    display: flex;
-    flex-direction: column;
-    color: #333; /* Change text color as needed */
-    font-size: 14px; /* Change font size as needed */
-}
-
-.user-details a {
-    text-decoration: none; /* Remove underlines from links */
-    color: blue; /* Change link color as needed */
-}
+/* header button and logo */
 
 .header-content {
     display: flex;
@@ -86,6 +67,7 @@ footer {
     margin-top: 0;
 }
 
+/* Hero of the page 'image' */
 #hero {
     background-image: url('../images/case-sizes.jpg');
     background-size: cover; 
@@ -113,7 +95,49 @@ footer {
     font-weight: bold; 
 }
 
-/*feature box */
+
+
+/* Information and log out button*/
+.user-info {
+    display: flex;
+    align-items: center;
+    font-size: 16px; 
+}
+
+.user-info img {
+    width: 40px; 
+    height: auto;
+    margin-right: 10px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    color: #ffffff;
+    font-size: 16px; 
+}
+
+.user-details .username,
+.user-details .user-email {
+    font-weight: bold;
+}
+
+.user-details a {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-top: 5px; 
+    background-color: #9e0015;
+    color: white; 
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease; 
+}
+
+.user-details a:hover {
+    background-color: #790101; 
+}
+
+/*feature box shipping etc*/
 .features {
     display: flex;
     justify-content: space-around;
@@ -130,5 +154,3 @@ footer {
     width: 60px; 
     height: 60px;
 }
-
-

@@ -52,7 +52,8 @@ def create_users_table():
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             email VARCHAR(255) NOT NULL,
-            password TEXT NOT NULL
+            password TEXT NOT NULL,
+            username VARCHAR(255) NOT NULL  -- Add the 'username' column here
         )
     ''')
     mysql.connection.commit()
@@ -83,6 +84,7 @@ def auth_page():
 def register_page():
     if request.method == 'POST':
         email = request.form['email']
+        username = request.form['username']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
 
@@ -92,7 +94,7 @@ def register_page():
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         cur = mysql.connection.cursor()
-        cur.execute('INSERT INTO users (email, password) VALUES (%s, %s)', (email, hashed_password))
+        cur.execute('INSERT INTO users (email, username, password) VALUES (%s, %s, %s)', (email, username, hashed_password))
         mysql.connection.commit()
         cur.close()
 
