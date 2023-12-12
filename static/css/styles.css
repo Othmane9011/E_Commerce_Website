@@ -9,6 +9,29 @@ header {
     padding: 10px 20px;
 }
 
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-info img {
+    width: 30px; /* Set width as needed */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Adjust margin as needed */
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    color: #333; /* Change text color as needed */
+    font-size: 14px; /* Change font size as needed */
+}
+
+.user-details a {
+    text-decoration: none; /* Remove underlines from links */
+    color: blue; /* Change link color as needed */
+}
+
 .header-content {
     display: flex;
     justify-content: space-between;
@@ -16,8 +39,8 @@ header {
 }
 
 .logo img {
-    width: 100px; /* Adjust the width as needed */
-    height: auto; /* Maintain aspect ratio */
+    width: 100px;
+    height: auto;
 }
 
 .header-buttons {
@@ -107,3 +130,5 @@ footer {
     width: 60px; 
     height: 60px;
 }
+
+
