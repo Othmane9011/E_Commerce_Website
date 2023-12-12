@@ -25,6 +25,26 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql.init_app(app)
 
 
+
+
+
+# Function to create the 'users' table if it doesn't exist
+def create_users_table():
+    cur = mysql.connection.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            email VARCHAR(255) NOT NULL,
+            password TEXT NOT NULL,
+            username VARCHAR(255) NOT NULL  -- Add the 'username' column here
+        )
+    ''')
+    mysql.connection.commit()
+    cur.close()
+
+with app.app_context():
+    create_users_table()
+
 # Function to fetch user email based on user_id
 def fetch_user_email(user_id):
     try:
@@ -45,36 +65,7 @@ def fetch_user_email(user_id):
 
     return None
 
-# Function to create the 'users' table if it doesn't exist
-def create_users_table():
-    cur = mysql.connection.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            email VARCHAR(255) NOT NULL,
-            password TEXT NOT NULL,
-            username VARCHAR(255) NOT NULL  -- Add the 'username' column here
-        )
-    ''')
-    mysql.connection.commit()
-    cur.close()
 
-with app.app_context():
-    create_users_table()
-
-# Function to create the 'products' table if it doesn't exist
-def create_products_table():
-    cur = mysql.connection.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS products (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            description TEXT,
-            price DECIMAL(10, 2) NOT NULL,
-            inventory INT NOT NULL
-        )
-    ''')
-    cur.close()
 
 @app.route('/')
 def auth_page():
@@ -133,7 +124,7 @@ def index():
         products = cur.fetchall()
         cur.close()
 
-        return render_template('index.html', products=products, user_email=user_email)
+        return render_template('index.html', user_email=user_email)
     else:
         return redirect('/')
     
@@ -142,43 +133,9 @@ def logout():
     session.clear()
     return redirect('/')
 
-# Function to insert sample data into 'products' table
-def insert_sample_data():
-    cur = mysql.connection.cursor()
-    cur.execute('INSERT INTO products (name, description, price, inventory) VALUES (%s, %s, %s, %s)', ('Product 1', 'Description of Product 1', 19.99, 100))
-    cur.execute('INSERT INTO products (name, description, price, inventory) VALUES (%s, %s, %s, %s)', ('Product 2', 'Description of Product 2', 29.99, 50))
-    mysql.connection.commit()
-    cur.close()
-
-# Automatically create 'products' table and insert sample data when the app starts
-with app.app_context():
-    create_products_table()
-    insert_sample_data()
-
-# Route to display product details
-@app.route('/product/<int:product_id>')
-def product(product_id):
-    # Fetch details of a specific product
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM products WHERE id = %s', (product_id,))
-    product = cur.fetchone()
-    cur.close()
-    return render_template('product.html', product=product)
-
-# Route to handle checkout
-@app.route('/checkout', methods=['POST'])
-def checkout():
-    # Process order checkout
-    if request.method == 'POST':
-        product_id = request.form['product_id']
-        quantity = request.form['quantity']
-        # Process the order, update inventory, etc.
-        cur = mysql.connection.cursor()
-        cur.execute('UPDATE products SET inventory = inventory - %s WHERE id = %s', (quantity, product_id))
-        mysql.connection.commit()
-        cur.close()
-
-        return redirect('/')  # Redirect to the main page after checkout
+@app.route('/manage')
+def manage_products():
+    return render_template('manage.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

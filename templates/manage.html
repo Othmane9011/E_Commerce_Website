@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Product Listing</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    </head>
+    <body>
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+                </div>
+                <div class="header-buttons">
+                    <a href="/shop" class="button">Shop</a>
+                    <a href="/cart" class="button">Cart</a>
+                </div>
+                <div class="user-info">
+                    <img src="{{ url_for('static', filename='images/user-icon.png') }}" alt="User Icon">
+                    <div class="user-details">
+                        <span class="username">{{ user_name }}</span>
+                        <span class="user-email">{{ user_email }}</span>
+                        <a href="/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+    <h1>Product Management</h1>
+
+    <!-- Form to add a new product -->
+    <h2>Add Product</h2>
+    <form action="/add_product" method="POST">
+        <label for="name">Product Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea><br>
+
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" required><br>
+
+        <label for="inventory">Inventory:</label>
+        <input type="number" id="inventory" name="inventory" required><br>
+
+        <input type="submit" value="Add Product">
+    </form>
+
+    <!-- Form to deactivate a product -->
+    <h2>Deactivate Product</h2>
+    <form action="/deactivate_product" method="POST">
+        <label for="product_id">Product ID:</label>
+        <input type="number" id="product_id" name="product_id" required><br>
+
+        <input type="submit" value="Deactivate Product">
+    </form>
+
+    <!-- Other management functions -->
+    <!-- Add more forms/buttons for other management actions -->
+
+</body>
+</html>
