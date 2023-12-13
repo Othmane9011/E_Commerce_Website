@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Product Listing</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/manage.css') }}">
     </head>
     <body>
         <header>
@@ -29,34 +29,62 @@
     <h1>Product Management</h1>
 
     <!-- Form to add a new product -->
-    <h2>Add Product</h2>
-    <form action="/add_product" method="POST">
-        <label for="name">Product Name:</label>
-        <input type="text" id="name" name="name" required><br>
+    <div class="container">
+        <div class="add-product-box">
+            <h2>Add Product</h2>
+            <form action="/add_product" method="POST" enctype="multipart/form-data">
+                <label for="name">Product Name:</label>
+                <input type="text" id="name" name="name" required><br>
+        
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required></textarea><br>
+        
+                <label for="price">Price:</label>
+                <input type="number" id="price" name="price" step="0.01" required><br>
+        
+                <label for="inventory">Inventory:</label>
+                <input type="number" id="inventory" name="inventory" required><br>
+        
+                <label for="category">Category:</label>
+                <input type="text" id="category" name="category"><br> 
+        
+                <label for="image">Product Image:</label>
+                <input type="file" id="image" name="image"><br> 
+        
+                <input type="submit" value="Add Product">
+            </form>
+        </div>
 
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea><br>
+        <h2>Product List</h2>
+    <div class="products-container">
+    {% for product in products %}
+        <div class="product-item">
+            <img src="{{ product.image_path }}" alt="{{ product.name }}">
+            <div class="product-details">
+                <h3>{{ product.name }}</h3>
+                <p>Category: {{ product.category }}</p>
+                <p>Price: ${{ product.price }}</p>
+                <p>Inventory: {{ product.inventory }}</p>
+                <p>ID: {{ product.id }}</p>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+    
+    
+        <div class="deactivate-product-box">
+            <h2>Deactivate Product</h2>
+            <form action="/deactivate_product" method="POST">
+                <div class="form-group">
+                    <label for="product_id">Product ID:</label>
+                    <input type="number" id="product_id" name="product_id" required>
+                </div>
+    
+                <input type="submit" value="Deactivate Product">
+            </form>
+        </div>
+    </div>
 
-        <label for="price">Price:</label>
-        <input type="number" id="price" name="price" step="0.01" required><br>
-
-        <label for="inventory">Inventory:</label>
-        <input type="number" id="inventory" name="inventory" required><br>
-
-        <input type="submit" value="Add Product">
-    </form>
-
-    <!-- Form to deactivate a product -->
-    <h2>Deactivate Product</h2>
-    <form action="/deactivate_product" method="POST">
-        <label for="product_id">Product ID:</label>
-        <input type="number" id="product_id" name="product_id" required><br>
-
-        <input type="submit" value="Deactivate Product">
-    </form>
-
-    <!-- Other management functions -->
-    <!-- Add more forms/buttons for other management actions -->
-
+    
 </body>
 </html>

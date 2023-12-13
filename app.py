@@ -4,6 +4,9 @@ from flask_mysqldb import MySQL
 from flask import render_template
 import bcrypt
 import mysql.connector
+import base64
+from werkzeug.utils import secure_filename
+
 
 
 
@@ -11,6 +14,7 @@ app = Flask(__name__, template_folder=os.path.abspath('templates'))
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'secretkey'
 
+UPLOAD_FOLDER = 'static/product_images'
 
 mysql = MySQL()
 
@@ -21,11 +25,26 @@ app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'tchokafew' 
 app.config['MYSQL_PORT'] = 3306  
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 mysql.init_app(app)
 
 
-
+def create_products_table():
+    cur = mysql.connection.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS products (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            price DECIMAL(10, 2) NOT NULL,
+            inventory INT NOT NULL,
+            category VARCHAR(255) NOT NULL,
+            image_path VARCHAR(255) NOT NULL
+        )
+    ''')
+    mysql.connection.commit()
+    cur.close()
 
 
 # Function to create the 'users' table if it doesn't exist
@@ -93,7 +112,14 @@ def register_page():
 
     return render_template('register.html')
 
+@app.route('/manage')
+def manage():
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM products')
+    products = cur.fetchall()
+    cur.close()
 
+    return render_template('manage.html', products=products)
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -136,6 +162,45 @@ def logout():
 @app.route('/manage')
 def manage_products():
     return render_template('manage.html')
+
+
+@app.route('/add_product', methods=['POST'])
+def add_product():
+    if request.method == 'POST':
+        name = request.form['name']
+        price = float(request.form['price'])
+        inventory = int(request.form['inventory'])
+        category = request.form['category']
+        
+        image = request.files['image']
+        if image.filename == '':
+            return 'No selected file'
+
+        if image:
+            # Use secure_filename to prevent any unsafe characters in the filename
+            filename = secure_filename(image.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image.save(image_path)
+
+            # Save the image path to the database
+            cur = mysql.connection.cursor()
+            cur.execute('''
+                INSERT INTO products (name, price, inventory, category, image_path)
+                VALUES (%s, %s, %s, %s, %s)
+            ''', (name, price, inventory, category, image_path))
+            mysql.connection.commit()
+            cur.close()
+
+            return redirect('/manage')
+        else:
+            return 'Image upload failed'
+    else:
+        return 'Invalid request method'
+
+@app.route('/product_list')
+def product_list():
+    products = get_products()  # Fetch product data from the database
+    return render_template('product_list.html', products=products)
 
 if __name__ == '__main__':
     app.run(debug=True)
