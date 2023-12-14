@@ -136,3 +136,22 @@ footer {
 .user-details a:hover {
     background-color: #790101; 
 }
+
+/* features shipping etc. */
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.feature-box {
+    text-align: center;
+    padding: 10px; 
+}
+
+.feature-box img {
+    width: 60px; 
+    height: 60px; 
+}

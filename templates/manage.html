@@ -56,9 +56,9 @@
         </div>
 
         <h2>Product List</h2>
-    <div class="products-container">
-    {% for product in products %}
-        <div class="product-item">
+        <div class="products-container">
+            {% for product in products %}
+            <div class="product-item">
             <img src="{{ product.image_path }}" alt="{{ product.name }}">
             <div class="product-details">
                 <h3>{{ product.name }}</h3>
@@ -67,11 +67,13 @@
                 <p>Inventory: {{ product.inventory }}</p>
                 <p>ID: {{ product.id }}</p>
             </div>
-        {% endfor %}
+
+            </div>
+            {% endfor %}
         </div>
     </div>
     
-    
+
         <div class="deactivate-product-box">
             <h2>Deactivate Product</h2>
             <form action="/deactivate_product" method="POST">
@@ -85,6 +87,5 @@
         </div>
     </div>
 
-    
 </body>
 </html>

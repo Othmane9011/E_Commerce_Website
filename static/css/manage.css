@@ -199,10 +199,6 @@ body {
     padding: 0;
 }
 
-.container {
-    width: 80%;
-    margin: 20px auto;
-}
 
 /* Styles for adding and deactivating products */
 .add-product-box,
@@ -278,6 +274,9 @@ input[type="submit"]:hover {
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
+    position: relative; 
+    z-index: 1;
+
 }
 
 .product-item img {
