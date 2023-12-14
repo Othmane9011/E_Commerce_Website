@@ -168,6 +168,7 @@ def manage_products():
 def add_product():
     if request.method == 'POST':
         name = request.form['name']
+        description = request.form['description']
         price = float(request.form['price'])
         inventory = int(request.form['inventory'])
         category = request.form['category']
@@ -185,15 +186,42 @@ def add_product():
             # Save the image path to the database
             cur = mysql.connection.cursor()
             cur.execute('''
-                INSERT INTO products (name, price, inventory, category, image_path)
-                VALUES (%s, %s, %s, %s, %s)
-            ''', (name, price, inventory, category, image_path))
+                INSERT INTO products (name, description, price, inventory, category, image_path)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            ''', (name, description, price, inventory, category, image_path))
             mysql.connection.commit()
             cur.close()
 
             return redirect('/manage')
         else:
             return 'Image upload failed'
+    else:
+        return 'Invalid request method'
+    
+@app.route('/modify_product/<int:product_id>', methods=['POST'])
+def modify_product(product_id):
+    if request.method == 'POST':
+        new_name = request.form['name']
+        new_price = request.form['price']
+        new_inventory = request.form['inventory']
+        new_category = request.form['category']
+        new_description = request.form['description']
+        # Fetch other modified attributes similarly
+
+        cur = mysql.connection.cursor()
+        cur.execute('''
+            UPDATE products 
+            SET name = %s, 
+                price = %s, 
+                inventory = %s, 
+                category = %s,
+                description = %s
+            WHERE id = %s
+        ''', (new_name, new_price, new_inventory, new_category, new_description, product_id))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect('/manage')
     else:
         return 'Invalid request method'
 
