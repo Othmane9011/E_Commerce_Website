@@ -51,11 +51,33 @@
             <h3>24/7 Support</h3>
         </div>
     </section>
+    <section>
+        <h1>Products</h1>
 
+        <div class="products-container">
+            {% for product in products %}
+                <div class="product">
+                    <div class="product-image">
+                        <img src="{{ product.image_path }}" alt="{{ product.name }}">
+                    </div>
+                    <div class="product-details">
+                        <h2>{{ product.name }}</h2>
+                        <p>Description: {{ product.description }}</p>
+                        <p>Price: ${{ product.price }}</p>
+                        <p>Inventory: {{ product.inventory }}</p>
+                        <p>Category: {{ product.category }}</p>
+                        <button class="add-to-cart-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/displayaddtocart.js') }}"></script>
+    </section>
 
 
     <footer>
-        <p>&copy; Tchokafew</p>
+    
     </footer>
 </body>
 </html>

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, jsonify, url_for, session
 from flask_mysqldb import MySQL
 from flask import render_template
 import bcrypt
@@ -30,39 +30,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 mysql.init_app(app)
 
 
-def create_products_table():
-    cur = mysql.connection.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS products (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            description TEXT,
-            price DECIMAL(10, 2) NOT NULL,
-            inventory INT NOT NULL,
-            category VARCHAR(255) NOT NULL,
-            image_path VARCHAR(255) NOT NULL
-        )
-    ''')
-    mysql.connection.commit()
-    cur.close()
 
-
-# Function to create the 'users' table if it doesn't exist
-def create_users_table():
-    cur = mysql.connection.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            email VARCHAR(255) NOT NULL,
-            password TEXT NOT NULL,
-            username VARCHAR(255) NOT NULL  -- Add the 'username' column here
-        )
-    ''')
-    mysql.connection.commit()
-    cur.close()
-
-with app.app_context():
-    create_users_table()
 
 # Function to fetch user email based on user_id
 def fetch_user_email(user_id):
@@ -74,13 +42,13 @@ def fetch_user_email(user_id):
         cur.close()
 
         if user:
-            return user['email']  # Return the fetched user's email
+            return user['email']
         else:
-            return None  # User with the specified ID not found
+            return None  
 
     except Exception as e:
         print("Error:", e)
-        return None  # Return None in case of an error
+        return None  
 
     return None
 
@@ -142,15 +110,14 @@ def login():
 def index():
     if 'logged_in' in session and session['logged_in']:
         user_id = session.get('user_id')
-
         user_email = fetch_user_email(user_id)
 
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM products')
+        cur.execute('SELECT * FROM products WHERE visibility = 1')  # Fetch only visible products
         products = cur.fetchall()
         cur.close()
 
-        return render_template('index.html', user_email=user_email)
+        return render_template('index.html', user_email=user_email, products=products)
     else:
         return redirect('/')
     
@@ -159,11 +126,14 @@ def logout():
     session.clear()
     return redirect('/')
 
+
 @app.route('/manage')
 def manage_products():
     return render_template('manage.html')
 
 
+
+#Adding a product to the database using the manage page
 @app.route('/add_product', methods=['POST'])
 def add_product():
     if request.method == 'POST':
@@ -197,7 +167,8 @@ def add_product():
             return 'Image upload failed'
     else:
         return 'Invalid request method'
-    
+
+#Modification of the products
 @app.route('/modify_product/<int:product_id>', methods=['POST'])
 def modify_product(product_id):
     if request.method == 'POST':
@@ -206,7 +177,6 @@ def modify_product(product_id):
         new_inventory = request.form['inventory']
         new_category = request.form['category']
         new_description = request.form['description']
-        # Fetch other modified attributes similarly
 
         cur = mysql.connection.cursor()
         cur.execute('''
@@ -225,10 +195,31 @@ def modify_product(product_id):
     else:
         return 'Invalid request method'
 
-@app.route('/product_list')
-def product_list():
-    products = get_products()  # Fetch product data from the database
-    return render_template('product_list.html', products=products)
+
+
+#Disable or enable visibility of a product from the manage page
+@app.route('/toggle_visibility/<int:product_id>', methods=['POST'])
+def toggle_visibility(product_id):
+    update_query = "UPDATE products SET visibility = 1 WHERE id = %s"
+    cur = mysql.connection.cursor()
+    cur.execute(update_query, (product_id,))
+    mysql.connection.commit()
+    cur.close()
+    
+    return '', 204 
+
+
+@app.route('/disable_visibility/<int:product_id>', methods=['POST'])
+def disable_visibility(product_id):
+    update_query = "UPDATE products SET visibility = 0 WHERE id = %s"
+    cur = mysql.connection.cursor()
+    cur.execute(update_query, (product_id,))
+    mysql.connection.commit()
+    cur.close()
+    
+    return '', 204 
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

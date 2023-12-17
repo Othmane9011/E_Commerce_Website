@@ -86,27 +86,23 @@
                 
                     <input type="submit" value="Modify Product">
                 </form>
+
+                <form action="/toggle_visibility/{{ product.id }}" method="POST">
+                    <input type="hidden" name="product_id" value="{{ product_id }}">
+                    <button type="submit">Toggle Visibility</button>
+                </form>
+                <form action="/disable_visibility/{{ product.id }}" method="POST">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <button type="submit">Disable Visibility</button>
+                </form>
+                <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+                <script src="{{ url_for('static', filename='js/togglevisibility.js') }}"></script>
+
             </div>
 
             </div>
             {% endfor %}
         </div>
-
-        <h2>Deactivate Product</h2>
-        <div class="deactivate-product-box">
-            <form action="/deactivate_product" method="POST">
-                <div class="form-group">
-                    <label for="product_id">Product ID:</label>
-                    <input type="number" id="product_id" name="product_id" required>
-                </div>
-    
-                <input type="submit" value="Deactivate Product">
-            </form>
-        </div>
-    </div>
-    
-
-        
 
 </body>
 </html>
