@@ -6,6 +6,7 @@ import bcrypt
 import mysql.connector
 import base64
 from werkzeug.utils import secure_filename
+from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 
 
 
@@ -30,6 +31,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 mysql.init_app(app)
 
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+users = {
+    1: {'id': 1, 'email': 'user@example.com', 'username': 'user', 'password': bcrypt.hashpw('password123'.encode('utf-8'), bcrypt.gensalt())}
+}
 
 
 # Function to fetch user email based on user_id
@@ -50,35 +56,77 @@ def fetch_user_email(user_id):
         print("Error:", e)
         return None  
 
-    return None
-
 
 
 @app.route('/')
 def auth_page():
-    return render_template('auth.html')
+    return render_template('login.html')
+
+class User(UserMixin):
+    def __init__(self, user_id, email, password):
+        self.id = user_id
+        self.email = email
+        self.password = password
+
+    @staticmethod
+    def get_by_email(email):
+        try:
+            cur = mysql.connection.cursor()
+            query = "SELECT id, email, password FROM users WHERE email = %s"
+            cur.execute(query, (email,))
+            user = cur.fetchone()
+            cur.close()
+
+            if user:
+                return User(user['id'], user['email'], user['password'])
+            else:
+                return None
+
+        except Exception as e:
+            print("Error:", e)
+            return None
+
+    @staticmethod
+    def get_by_id(user_id):
+        try:
+            cur = mysql.connection.cursor()
+            query = "SELECT id, email, password FROM users WHERE id = %s"
+            cur.execute(query, (user_id,))
+            user = cur.fetchone()
+            cur.close()
+
+            if user:
+                return User(user['id'], user['email'], user['password'])
+            else:
+                return None
+
+        except Exception as e:
+            print("Error:", e)
+            return None
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
-def register_page():
+def register():
     if request.method == 'POST':
         email = request.form['email']
         username = request.form['username']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
-
-        if password != confirm_password:
-            return 'Passwords do not match. Please try again.'
-
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        password = bcrypt.hashpw(request.form['password'].encode('utf-8'), bcrypt.gensalt())
 
         cur = mysql.connection.cursor()
-        cur.execute('INSERT INTO users (email, username, password) VALUES (%s, %s, %s)', (email, username, hashed_password))
+
+        cur.execute("INSERT INTO users (email, username, password) VALUES (%s, %s, %s)", (email, username, password))
         mysql.connection.commit()
+
         cur.close()
 
-        return redirect('/')
+        return redirect('/login')
 
     return render_template('register.html')
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get_by_id(user_id)
 
 @app.route('/manage')
 def manage():
@@ -89,22 +137,21 @@ def manage():
 
     return render_template('manage.html', products=products)
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    email = request.form['email']
-    password = request.form['password']
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
 
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM users WHERE email = %s', (email,))
-    user = cur.fetchone()
-    cur.close()
+        user = User.get_by_email(email)
 
-    if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
-        session['logged_in'] = True
-        session['user_id'] = user['id']  # Store user ID in session
-        return redirect('/index')  # Redirect to the route rendering index.html after successful login
-    else:
+        if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            login_user(user)
+            return redirect('/index')
+
         return 'Invalid email or password'
+
+    return render_template('login.html')
 
 @app.route('/index')
 def index():
@@ -122,9 +169,15 @@ def index():
         return redirect('/')
     
 @app.route('/logout')
+@login_required
 def logout():
-    session.clear()
+    logout_user()
     return redirect('/')
+
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html')
 
 
 @app.route('/manage')
@@ -219,6 +272,45 @@ def disable_visibility(product_id):
     
     return '', 204 
 
+
+@app.route('/add_to_cart/<int:product_id>', methods=['POST'])
+def add_to_cart(product_id):
+    if 'user_id' in session:  # Check if user is logged in
+        user_id = session['user_id']
+
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM cart WHERE user_id = %s AND product_id = %s', (user_id, product_id))
+        existing_item = cur.fetchone()
+
+        if existing_item:
+            new_quantity = existing_item['quantity'] + 1
+            cur.execute('UPDATE cart SET quantity = %s WHERE user_id = %s AND product_id = %s', (new_quantity, user_id, product_id))
+        else:
+            cur.execute('INSERT INTO cart (user_id, product_id, quantity) VALUES (%s, %s, 1)', (user_id, product_id))
+        
+        mysql.connection.commit()
+        cur.close()
+        
+        return redirect('/cart')
+    else:
+        return redirect('/login')
+
+@app.route('/cart')
+@login_required
+def view_cart():
+    user_id = session['user_id']
+
+    cur = mysql.connection.cursor()
+    cur.execute('''
+        SELECT products.*, cart.quantity 
+        FROM cart 
+        JOIN products ON cart.product_id = products.id 
+        WHERE cart.user_id = %s
+    ''', (user_id,))
+    cart_items = cur.fetchall()
+    cur.close()
+
+    return render_template('cart.html', cart_items=cart_items)
 
 
 if __name__ == '__main__':

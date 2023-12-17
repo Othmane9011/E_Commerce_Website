@@ -9,10 +9,12 @@
         <header>
             <div class="header-content">
                 <div class="logo">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+                    <a href="/" class="logo-link"> <!-- Redirects to the login page -->
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+                    </a>
                 </div>
                 <div class="header-buttons">
-                    <a href="/shop" class="button">Shop</a>
+                    <a href="/manage" class="button">Manage</a>
                     <a href="/cart" class="button">Cart</a>
                 </div>
                 <div class="user-info">
@@ -20,7 +22,7 @@
                     <div class="user-details">
                         <span class="username">{{ user_name }}</span>
                         <span class="user-email">{{ user_email }}</span>
-                        <a href="/logout">Logout</a>
+                        <a href="/logout" class="logout-button">Logout</a> <!-- Logout button -->
                     </div>
                 </div>
             </div>
@@ -54,7 +56,7 @@
     <section>
         <h1>Products</h1>
 
-        <div class="products-container">
+        <div class="products-container" id="productsContainer">
             {% for product in products %}
                 <div class="product">
                     <div class="product-image">
@@ -71,9 +73,29 @@
                 </div>
             {% endfor %}
         </div>
-        <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/displayaddtocart.js') }}"></script>
     </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart-btn').on('click', function() {
+            var productId = $(this).data('product-id');
+
+            // Send an AJAX request to add the product to the cart
+            $.ajax({
+                type: 'POST',
+                url: '/add_to_cart/' + productId,
+                success: function(response) {
+                    // Upon success, you can show a message or update the UI as needed
+                    alert('Product added to cart successfully!');
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors here (e.g., show an error message)
+                    alert('Error adding product to cart: ' + error);
+                }
+            });
+        });
+    });
+</script>
 
 
     <footer>
