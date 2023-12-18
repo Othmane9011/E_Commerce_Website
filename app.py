@@ -9,8 +9,6 @@ from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 
 
-
-
 app = Flask(__name__, template_folder=os.path.abspath('templates'))
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'secretkey'
@@ -22,9 +20,9 @@ mysql = MySQL()
 # Configure MySQL
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''  
-app.config['MYSQL_DB'] = 'tchokafew' 
-app.config['MYSQL_PORT'] = 3306  
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'tchokafew'
+app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -50,11 +48,12 @@ def fetch_user_email(user_id):
         if user:
             return user['email']
         else:
-            return None  
+            return None
 
     except Exception as e:
         print("Error:", e)
-        return None  
+        return None
+
 
 @app.context_processor
 def inject_user_name():
@@ -79,6 +78,7 @@ def inject_user_name():
 @app.route('/')
 def auth_page():
     return render_template('login.html')
+
 
 class User(UserMixin):
     def __init__(self, user_id, email, password):
@@ -123,17 +123,18 @@ class User(UserMixin):
             return None
 
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         email = request.form['email']
         username = request.form['username']
-        password = bcrypt.hashpw(request.form['password'].encode('utf-8'), bcrypt.gensalt())
+        password = bcrypt.hashpw(
+            request.form['password'].encode('utf-8'), bcrypt.gensalt())
 
         cur = mysql.connection.cursor()
 
-        cur.execute("INSERT INTO users (email, username, password) VALUES (%s, %s, %s)", (email, username, password))
+        cur.execute("INSERT INTO users (email, username, password) VALUES (%s, %s, %s)",
+                    (email, username, password))
         mysql.connection.commit()
 
         cur.close()
@@ -142,9 +143,11 @@ def register():
 
     return render_template('register.html')
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.get_by_id(user_id)
+
 
 @app.route('/manage')
 def manage():
@@ -154,6 +157,7 @@ def manage():
     cur.close()
 
     return render_template('manage.html', products=products)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -171,6 +175,7 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/index')
 def index():
     if 'logged_in' in session and session['logged_in']:
@@ -178,19 +183,22 @@ def index():
         user_email = fetch_user_email(user_id)
 
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM products WHERE visibility = 1')  # Fetch only visible products
+        # Fetch only visible products
+        cur.execute('SELECT * FROM products WHERE visibility = 1')
         products = cur.fetchall()
         cur.close()
 
         return render_template('index.html', user_email=user_email, products=products)
     else:
         return redirect('/')
-    
+
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect('/')
+
 
 @app.route('/profile')
 @login_required
@@ -203,8 +211,7 @@ def manage_products():
     return render_template('manage.html')
 
 
-
-#Adding a product to the database using the manage page
+# Adding a product to the database using the manage page
 @app.route('/add_product', methods=['POST'])
 def add_product():
     if request.method == 'POST':
@@ -213,7 +220,7 @@ def add_product():
         price = float(request.form['price'])
         inventory = int(request.form['inventory'])
         category = request.form['category']
-        
+
         image = request.files['image']
         if image.filename == '':
             return 'No selected file'
@@ -239,7 +246,8 @@ def add_product():
     else:
         return 'Invalid request method'
 
-#Modification of the products
+# Modification of the products
+
 @app.route('/modify_product/<int:product_id>', methods=['POST'])
 def modify_product(product_id):
     if request.method == 'POST':
@@ -267,8 +275,7 @@ def modify_product(product_id):
         return 'Invalid request method'
 
 
-
-#Disable or enable visibility of a product from the manage page
+# Disable or enable visibility of a product from the manage page
 @app.route('/toggle_visibility/<int:product_id>', methods=['POST'])
 def toggle_visibility(product_id):
     update_query = "UPDATE products SET visibility = 1 WHERE id = %s"
@@ -276,8 +283,8 @@ def toggle_visibility(product_id):
     cur.execute(update_query, (product_id,))
     mysql.connection.commit()
     cur.close()
-    
-    return '', 204 
+
+    return '', 204
 
 
 @app.route('/disable_visibility/<int:product_id>', methods=['POST'])
@@ -287,53 +294,60 @@ def disable_visibility(product_id):
     cur.execute(update_query, (product_id,))
     mysql.connection.commit()
     cur.close()
-    
-    return '', 204 
+
+    return '', 204
 
 
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
-    user_id = current_user.get_id()  # Retrieve user ID using Flask-Login's current_user object
+    # Retrieve user ID using Flask-Login's current_user object
+    user_id = current_user.get_id()
 
     if user_id:
         try:
             cur = mysql.connection.cursor()
 
             # Fetch product details from the products table based on product_id
-            cur.execute('SELECT name, description, price, inventory, category, image_path FROM products WHERE id = %s', (product_id,))
+            cur.execute(
+                'SELECT name, description, price, inventory, category, image_path FROM products WHERE id = %s', (product_id,))
             product_info = cur.fetchone()
 
             if product_info:
                 # Check if the product already exists in the user's cart
-                cur.execute('SELECT * FROM cart WHERE user_id = %s AND product_id = %s', (user_id, product_id))
+                cur.execute(
+                    'SELECT * FROM cart WHERE user_id = %s AND product_id = %s', (user_id, product_id))
                 existing_item = cur.fetchone()
 
                 if existing_item:
                     # If the product exists, increment its quantity
                     new_quantity = existing_item['quantity'] + 1
-                    cur.execute('UPDATE cart SET quantity = %s WHERE user_id = %s AND product_id = %s', (new_quantity, user_id, product_id))
+                    cur.execute('UPDATE cart SET quantity = %s WHERE user_id = %s AND product_id = %s', (
+                        new_quantity, user_id, product_id))
                 else:
                     # If the product doesn't exist, insert it into the cart with product details and quantity 1
                     cur.execute('INSERT INTO cart (user_id, product_id, quantity, name, description, price, inventory, category, image_path) VALUES (%s, %s, 1, %s, %s, %s, %s, %s, %s)',
                                 (user_id, product_id, product_info['name'], product_info['description'], product_info['price'], product_info['inventory'], product_info['category'], product_info['image_path']))
-                
+
                 mysql.connection.commit()
                 cur.close()
-                
+
                 return redirect('/cart')
             else:
                 return 'Product not found', 404
         except Exception as e:
             print("Error:", e)
-            return 'Error adding product to cart', 500  # Return an error message and status code for internal server error
+            # Return an error message and status code for internal server error
+            return 'Error adding product to cart', 500
     else:
         return redirect('/login')
+
 
 @app.route('/cart')
 @login_required
 def view_cart():
-    user_id = current_user.get_id()  # Retrieve user ID using Flask-Login's current_user object
+    # Retrieve user ID using Flask-Login's current_user object
+    user_id = current_user.get_id()
 
     if user_id:
         try:
@@ -349,16 +363,18 @@ def view_cart():
 
             # Calculate total items and total price
             total_items = sum(item['quantity'] for item in cart_items)
-            total_price = sum(item['price'] * item['quantity'] for item in cart_items)
+            total_price = sum(item['price'] * item['quantity']
+                              for item in cart_items)
 
             return render_template('cart.html', cart_items=cart_items, total_items=total_items, total_price=total_price)
         except Exception as e:
             print("Error:", e)
-            return 'Error fetching cart items', 500  # Return an error message and status code for internal server error
+            # Return an error message and status code for internal server error
+            return 'Error fetching cart items', 500
     else:
         return redirect('/login')
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-    #express js 
+    # express js

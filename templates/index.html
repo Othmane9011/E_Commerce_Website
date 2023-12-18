@@ -1,40 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Product Listing</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    </head>
-    <body>
-        <header>
-            <div class="header-content">
-                <div class="logo">
-                    <a href="/" class="logo-link"> <!-- Redirects to the login page -->
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-                    </a>
-                </div>
-                <div class="header-buttons">
-                    <a href="/manage" class="button">Manage</a>
-                    <a href="/cart" class="button">Cart</a>
-                </div>
-                <div class="user-info">
-                    <img src="{{ url_for('static', filename='images/user-icon.png') }}" alt="User Icon">
-                    <div class="user-details">
-                        <span class="username">{{ user_name }}</span>
-                        <a href="/logout" class="logout-button">Logout</a> <!-- Logout button -->
-                    </div>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Product Listing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <a href="/" class="logo-link"> <!-- Redirects to the login page -->
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+                </a>
+            </div>
+            <div class="header-buttons">
+                <a href="/manage" class="button">Manage</a>
+                <a href="/cart" class="button">Cart</a>
+            </div>
+            <div class="user-info">
+                <i class="fa-solid fa-user fa-2xl" style="color: #ffffff;"></i>
+                <div class="user-details">
+                    <span class="username">{{ user_name }}</span>
+                    <a href="/logout" class="logout-button">Logout</a>
                 </div>
             </div>
-        </header>
-        
+        </div>
+    </header>
+
 
     <section id="hero">
         <div>
-        <h4>Offer</h4>
-        <h2>Super deal</h2>
-        <h1>On this product</h1>
-        <p>Save 30% off !</p>
-        <a href="#products" class="button">Shop Now</a>
+            <h4>Offer</h4>
+            <h2>Super deal</h2>
+            <h1>On this product</h1>
+            <p>Save 30% off !</p>
+            <a href="#products" class="button">Shop Now</a>
         </div>
     </section>
 
@@ -57,48 +59,50 @@
 
         <div class="products-container" id="productsContainer">
             {% for product in products %}
-                <div class="product">
-                    <div class="product-image">
-                        <img src="{{ product.image_path }}" alt="{{ product.name }}">
-                    </div>
-                    <div class="product-details">
-                        <h2>{{ product.name }}</h2>
-                        <p>Description: {{ product.description }}</p>
-                        <p>Price: ${{ product.price }}</p>
-                        <p>Inventory: {{ product.inventory }}</p>
-                        <p>Category: {{ product.category }}</p>
-                        <button class="add-to-cart-btn" data-product-id="{{ product.id }}">Add to Cart</button>
-                    </div>
+            <div class="product">
+                <div class="product-image">
+                    <img src="{{ product.image_path }}" alt="{{ product.name }}">
                 </div>
+                <div class="product-details">
+                    <h2>{{ product.name }}</h2>
+                    <p>Description: {{ product.description }}</p>
+                    <p>Price: ${{ product.price }}</p>
+                    <p>Inventory: {{ product.inventory }}</p>
+                    <p>Category: {{ product.category }}</p>
+                    <button class="add-to-cart-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+                </div>
+            </div>
             {% endfor %}
         </div>
     </section>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('.add-to-cart-btn').on('click', function() {
-            var productId = $(this).data('product-id');
+    <script>
+        $(document).ready(function () {
+            $('.add-to-cart-btn').on('click', function () {
+                var productId = $(this).data('product-id');
 
-            // Send an AJAX request to add the product to the cart
-            $.ajax({
-                type: 'POST',
-                url: '/add_to_cart/' + productId,
-                success: function(response) {
-                    // Upon success, you can show a message or update the UI as needed
-                    alert('Product added to cart successfully!');
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors here (e.g., show an error message)
-                    alert('Error adding product to cart: ' + error);
-                }
+                // Send an AJAX request to add the product to the cart
+                $.ajax({
+                    type: 'POST',
+                    url: '/add_to_cart/' + productId,
+                    success: function (response) {
+                        // Upon success, you can show a message or update the UI as needed
+                        alert('Product added to cart successfully!');
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle errors here (e.g., show an error message)
+                        alert('Error adding product to cart: ' + error);
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
+    <script src="https://kit.fontawesome.com/09c454a1ec.js" crossorigin="anonymous"></script>
 
 
     <footer>
-    
+
     </footer>
 </body>
+
 </html>
