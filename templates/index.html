@@ -21,7 +21,6 @@
                     <img src="{{ url_for('static', filename='images/user-icon.png') }}" alt="User Icon">
                     <div class="user-details">
                         <span class="username">{{ user_name }}</span>
-                        <span class="user-email">{{ user_email }}</span>
                         <a href="/logout" class="logout-button">Logout</a> <!-- Logout button -->
                     </div>
                 </div>
@@ -35,7 +34,7 @@
         <h2>Super deal</h2>
         <h1>On this product</h1>
         <p>Save 30% off !</p>
-        <a href="/products" class="button">Shop Now</a>
+        <a href="#products" class="button">Shop Now</a>
         </div>
     </section>
 
@@ -53,7 +52,7 @@
             <h3>24/7 Support</h3>
         </div>
     </section>
-    <section>
+    <section id="products">
         <h1>Products</h1>
 
         <div class="products-container" id="productsContainer">

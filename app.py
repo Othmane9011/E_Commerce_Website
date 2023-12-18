@@ -6,7 +6,7 @@ import bcrypt
 import mysql.connector
 import base64
 from werkzeug.utils import secure_filename
-from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 
 
 
@@ -56,6 +56,24 @@ def fetch_user_email(user_id):
         print("Error:", e)
         return None  
 
+@app.context_processor
+def inject_user_name():
+    user_name = None
+    if current_user.is_authenticated:
+        user_id = current_user.get_id()
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute('SELECT username FROM users WHERE id = %s', (user_id,))
+            user = cur.fetchone()
+            cur.close()
+
+            if user:
+                user_name = user['username']
+        except Exception as e:
+            print("Error:", e)
+            # Handle the error appropriately
+
+    return dict(user_name=user_name)
 
 
 @app.route('/')
@@ -274,43 +292,71 @@ def disable_visibility(product_id):
 
 
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
+@login_required
 def add_to_cart(product_id):
-    if 'user_id' in session:  # Check if user is logged in
-        user_id = session['user_id']
+    user_id = current_user.get_id()  # Retrieve user ID using Flask-Login's current_user object
 
-        cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM cart WHERE user_id = %s AND product_id = %s', (user_id, product_id))
-        existing_item = cur.fetchone()
+    if user_id:
+        try:
+            cur = mysql.connection.cursor()
 
-        if existing_item:
-            new_quantity = existing_item['quantity'] + 1
-            cur.execute('UPDATE cart SET quantity = %s WHERE user_id = %s AND product_id = %s', (new_quantity, user_id, product_id))
-        else:
-            cur.execute('INSERT INTO cart (user_id, product_id, quantity) VALUES (%s, %s, 1)', (user_id, product_id))
-        
-        mysql.connection.commit()
-        cur.close()
-        
-        return redirect('/cart')
+            # Fetch product details from the products table based on product_id
+            cur.execute('SELECT name, description, price, inventory, category, image_path FROM products WHERE id = %s', (product_id,))
+            product_info = cur.fetchone()
+
+            if product_info:
+                # Check if the product already exists in the user's cart
+                cur.execute('SELECT * FROM cart WHERE user_id = %s AND product_id = %s', (user_id, product_id))
+                existing_item = cur.fetchone()
+
+                if existing_item:
+                    # If the product exists, increment its quantity
+                    new_quantity = existing_item['quantity'] + 1
+                    cur.execute('UPDATE cart SET quantity = %s WHERE user_id = %s AND product_id = %s', (new_quantity, user_id, product_id))
+                else:
+                    # If the product doesn't exist, insert it into the cart with product details and quantity 1
+                    cur.execute('INSERT INTO cart (user_id, product_id, quantity, name, description, price, inventory, category, image_path) VALUES (%s, %s, 1, %s, %s, %s, %s, %s, %s)',
+                                (user_id, product_id, product_info['name'], product_info['description'], product_info['price'], product_info['inventory'], product_info['category'], product_info['image_path']))
+                
+                mysql.connection.commit()
+                cur.close()
+                
+                return redirect('/cart')
+            else:
+                return 'Product not found', 404
+        except Exception as e:
+            print("Error:", e)
+            return 'Error adding product to cart', 500  # Return an error message and status code for internal server error
     else:
         return redirect('/login')
 
 @app.route('/cart')
 @login_required
 def view_cart():
-    user_id = session['user_id']
+    user_id = current_user.get_id()  # Retrieve user ID using Flask-Login's current_user object
 
-    cur = mysql.connection.cursor()
-    cur.execute('''
-        SELECT products.*, cart.quantity 
-        FROM cart 
-        JOIN products ON cart.product_id = products.id 
-        WHERE cart.user_id = %s
-    ''', (user_id,))
-    cart_items = cur.fetchall()
-    cur.close()
+    if user_id:
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute('''
+                SELECT products.name, products.description, products.price, products.inventory, products.category, products.image_path, cart.quantity 
+                FROM cart 
+                JOIN products ON cart.product_id = products.id 
+                WHERE cart.user_id = %s
+            ''', (user_id,))
+            cart_items = cur.fetchall()
+            cur.close()
 
-    return render_template('cart.html', cart_items=cart_items)
+            # Calculate total items and total price
+            total_items = sum(item['quantity'] for item in cart_items)
+            total_price = sum(item['price'] * item['quantity'] for item in cart_items)
+
+            return render_template('cart.html', cart_items=cart_items, total_items=total_items, total_price=total_price)
+        except Exception as e:
+            print("Error:", e)
+            return 'Error fetching cart items', 500  # Return an error message and status code for internal server error
+    else:
+        return redirect('/login')
 
 
 if __name__ == '__main__':
