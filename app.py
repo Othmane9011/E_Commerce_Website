@@ -70,7 +70,6 @@ def inject_user_name():
                 user_name = user['username']
         except Exception as e:
             print("Error:", e)
-            # Handle the error appropriately
 
     return dict(user_name=user_name)
 
@@ -183,7 +182,6 @@ def index():
         user_email = fetch_user_email(user_id)
 
         cur = mysql.connection.cursor()
-        # Fetch only visible products
         cur.execute('SELECT * FROM products WHERE visibility = 1')
         products = cur.fetchall()
         cur.close()
@@ -214,7 +212,9 @@ def manage_products():
 # Adding a product to the database using the manage page
 @app.route('/add_product', methods=['POST'])
 def add_product():
+
     if request.method == 'POST':
+
         name = request.form['name']
         description = request.form['description']
         price = float(request.form['price'])
@@ -226,12 +226,11 @@ def add_product():
             return 'No selected file'
 
         if image:
-            # Use secure_filename to prevent any unsafe characters in the filename
+
             filename = secure_filename(image.filename)
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             image.save(image_path)
 
-            # Save the image path to the database
             cur = mysql.connection.cursor()
             cur.execute('''
                 INSERT INTO products (name, description, price, inventory, category, image_path)
@@ -247,7 +246,6 @@ def add_product():
         return 'Invalid request method'
 
 # Modification of the products
-
 @app.route('/modify_product/<int:product_id>', methods=['POST'])
 def modify_product(product_id):
     if request.method == 'POST':
@@ -286,7 +284,7 @@ def toggle_visibility(product_id):
 
     return '', 204
 
-
+# mange page disabllle or enablle
 @app.route('/disable_visibility/<int:product_id>', methods=['POST'])
 def disable_visibility(product_id):
     update_query = "UPDATE products SET visibility = 0 WHERE id = %s"
@@ -298,34 +296,34 @@ def disable_visibility(product_id):
     return '', 204
 
 
+#add to cart
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
-    # Retrieve user ID using Flask-Login's current_user object
+
     user_id = current_user.get_id()
 
     if user_id:
         try:
             cur = mysql.connection.cursor()
 
-            # Fetch product details from the products table based on product_id
             cur.execute(
                 'SELECT name, description, price, inventory, category, image_path FROM products WHERE id = %s', (product_id,))
             product_info = cur.fetchone()
 
             if product_info:
-                # Check if the product already exists in the user's cart
+
                 cur.execute(
                     'SELECT * FROM cart WHERE user_id = %s AND product_id = %s', (user_id, product_id))
                 existing_item = cur.fetchone()
 
                 if existing_item:
-                    # If the product exists, increment its quantity
+
                     new_quantity = existing_item['quantity'] + 1
                     cur.execute('UPDATE cart SET quantity = %s WHERE user_id = %s AND product_id = %s', (
                         new_quantity, user_id, product_id))
                 else:
-                    # If the product doesn't exist, insert it into the cart with product details and quantity 1
+
                     cur.execute('INSERT INTO cart (user_id, product_id, quantity, name, description, price, inventory, category, image_path) VALUES (%s, %s, 1, %s, %s, %s, %s, %s, %s)',
                                 (user_id, product_id, product_info['name'], product_info['description'], product_info['price'], product_info['inventory'], product_info['category'], product_info['image_path']))
 
@@ -337,16 +335,16 @@ def add_to_cart(product_id):
                 return 'Product not found', 404
         except Exception as e:
             print("Error:", e)
-            # Return an error message and status code for internal server error
             return 'Error adding product to cart', 500
     else:
         return redirect('/login')
 
 
+#view cart
 @app.route('/cart')
 @login_required
 def view_cart():
-    # Retrieve user ID using Flask-Login's current_user object
+
     user_id = current_user.get_id()
 
     if user_id:
@@ -361,7 +359,7 @@ def view_cart():
             cart_items = cur.fetchall()
             cur.close()
 
-            # Calculate total items and total price
+
             total_items = sum(item['quantity'] for item in cart_items)
             total_price = sum(item['price'] * item['quantity']
                               for item in cart_items)
@@ -369,7 +367,7 @@ def view_cart():
             return render_template('cart.html', cart_items=cart_items, total_items=total_items, total_price=total_price)
         except Exception as e:
             print("Error:", e)
-            # Return an error message and status code for internal server error
+
             return 'Error fetching cart items', 500
     else:
         return redirect('/login')
