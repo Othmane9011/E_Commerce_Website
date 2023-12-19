@@ -9,7 +9,9 @@
   
 
 /* Cart container */
-
+body{
+    height: 200vh;
+}
 .cart-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -39,15 +41,41 @@
 /* Cart summary */
 .cart-summary {
     margin-top: 20px;
+    height: 150px;
     padding: 10px;
     border: 1px solid #ddd;
     background-color: #f9f9f9;
+    position: relative;
 }
 
 /* Product name */
 .product-name {
     font-weight: bold;
 }
+
+.checkout-btn{
+position: absolute;
+bottom: 20px;
+right: 20px;
+border: none;
+padding: 10px 25px;
+border: solid 2px red;
+color: red;
+text-decoration: none;
+border-radius: 50px;
+transition: all 0.5s;
+}
+.checkout-btn:hover{
+    background: red;
+    color: white;
+    border: solid 2px red;
+
+}
+.btnToHide{
+    border: none;
+    background-color: transparent;
+}
+
     </style>
     <body>
         <header>
@@ -72,7 +100,7 @@
         </header>
         <section class="hero-cart">
             <div class="info-hero">
-                <h1 class="title-hero">Cart</h1>
+                <h1 class="title-hero">FINISH YOUR DREAM</h1>
             </div>
     
         </section>
@@ -110,9 +138,11 @@
                     <p>Total items: {{ total_items }}</p>
                     <p>Total price: ${{ total_price }}</p>
                 </div>
-                <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
+                
+                <button type="button" class="btnToHide"><a href="/checkout" class="checkout-btn">Proceed to Checkout</a></button>
             </div>
         </div>
+
         
         <script src="https://kit.fontawesome.com/09c454a1ec.js" crossorigin="anonymous"></script>
         <script src="{{ url_for('static', filename='js/app.js') }}"></script>

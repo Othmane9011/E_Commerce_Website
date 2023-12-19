@@ -107,17 +107,7 @@ body {
 .button:hover {
     background-color: #777;
 }
-footer {
-    background-color: #1c1c1c;
-    color: white;
-    padding: 10px 20px;
-    position: ;
-    bottom: 0;
-    width: 100%;
-    height: 75px;
-    text-align: center;
-    line-height: 4;
-}
+
 .container {
     /* width: 80%;
     display: flex;
@@ -375,4 +365,15 @@ font-style: italic;
     background: transparent;
     border: solid 2px rgb(187, 0, 0);
     color: rgb(187, 0, 0);
+}
+footer {
+    background-color: #1c1c1c;
+    color: white;
+    padding: 10px 20px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 75px;
+    text-align: center;
+    line-height: 4;
 }
