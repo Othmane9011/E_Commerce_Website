@@ -3,12 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <title>Product Listing</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
     </head>
     <style>
   
 
 /* Cart container */
+
 .cart-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -50,24 +51,31 @@
     </style>
     <body>
         <header>
-            <div class="header-content">
-                <div class="logo">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            <nav class="nav-user">
+                <ul class="ul-user">
+                    <li class="item-nav"><a href="/manage" class="link-nav">MANAGE</a>
+                    </li>
+                    <li class="item-nav"><a href="/index" class="link-nav"><img
+                                src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo-nav"></a>
+                    </li>
+                    <li class="item-nav"><a href="/cart" class="link-nav">CART</a>
+                    </li>
+                </ul>
+                <div class="bg-user">
+    
+                    <i class="fa-solid fa-user icon-user"></i>
+                    <span class="username-user">{{ user_name }}</span>
+                    <a href="/logout" class="logout"><i class="fa-sharp fa-regular fa-circle-xmark"></i></a>
+    
                 </div>
-                <div class="header-buttons">
-                    <a href="/manage" class="button">Manage</a>
-                    <a href="/cart" class="button">Cart</a>
-                </div>
-                <div class="user-info">
-                    <img src="{{ url_for('static', filename='images/user-icon.png') }}" alt="User Icon">
-                    <div class="user-details">
-                        <span class="username">{{ user_name }}</span>
-                        <span class="user-email">{{ user_email }}</span>
-                        <a href="/logout">Logout</a>
-                    </div>
-                </div>
-            </div>
+            </nav>
         </header>
+        <section class="hero-cart">
+            <div class="info-hero">
+                <h1 class="title-hero">Cart</h1>
+            </div>
+    
+        </section>
         <div class="cart-container">
             <h1>Your Cart</h1>
             <table class="cart-table">
@@ -105,5 +113,8 @@
                 <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
             </div>
         </div>
-</body>
+        
+        <script src="https://kit.fontawesome.com/09c454a1ec.js" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    </body>
 </html>

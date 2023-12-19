@@ -4,77 +4,82 @@
 <head>
     <meta charset="UTF-8">
     <title>Product Listing</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/product.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
     <header>
-        <div class="header-content">
-            <div class="logo">
-                <a href="/" class="logo-link"> <!-- Redirects to the login page -->
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-                </a>
+        <nav class="nav-user">
+            <ul class="ul-user">
+                <li class="item-nav"><a href="/manage" class="link-nav">MANAGE</a>
+                </li>
+                <li class="item-nav"><a href="/index" class="link-nav"><img
+                            src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo-nav"></a>
+                </li>
+                <li class="item-nav"><a href="/cart" class="link-nav">CART</a>
+                </li>
+            </ul>
+            <div class="bg-user">
+
+                <i class="fa-solid fa-user icon-user"></i>
+                <span class="username-user">{{ user_name }}</span>
+                <a href="/logout" class="logout"><i class="fa-sharp fa-regular fa-circle-xmark"></i></a>
+
             </div>
-            <div class="header-buttons">
-                <a href="/manage" class="button">Manage</a>
-                <a href="/cart" class="button">Cart</a>
-            </div>
-            <div class="user-info">
-                <i class="fa-solid fa-user fa-2xl" style="color: #ffffff;"></i>
-                <div class="user-details">
-                    <span class="username">{{ user_name }}</span>
-                    <a href="/logout" class="logout-button">Logout</a>
-                </div>
-            </div>
-        </div>
+        </nav>
     </header>
 
-
-    <section id="hero">
-        <div>
-            <h4>Offer</h4>
-            <h2>Super deal</h2>
-            <h1>On this product</h1>
-            <p>Save 30% off !</p>
-            <a href="#products" class="button">Shop Now</a>
+    <section class="hero-bg">
+        <div class="info-hero">
+            <h1 class="title-hero">Offer Super Deal</h1>
+            <p class="desc-hero">On this product</p>
+            <p class="discount-hero">Save 30% off </p>
+            <a href="#anchor-state" class="btn-hero">Shop Now</a>
         </div>
+
     </section>
+    <div id="anchor-state"></div>
 
     <section class="features">
         <div class="feature-box">
             <img src="{{ url_for('static', filename='images/free-shipping.png') }}" alt="Free Shipping">
-            <h3>Free Shipping</h3>
+            <h3 class="feature-text">Free Shipping</h3>
         </div>
         <div class="feature-box">
             <img src="{{ url_for('static', filename='images/online-order.png') }}" alt="Online Order">
-            <h3>Online Order</h3>
+            <h3 class="feature-text">Online Order</h3>
         </div>
         <div class="feature-box">
             <img src="{{ url_for('static', filename='images/Support.png') }}" alt="24/7 Support">
-            <h3>24/7 Support</h3>
+            <h3 class="feature-text">24/7 Support</h3>
         </div>
     </section>
+
     <section id="products">
-        <h1>Products</h1>
+        <h1 class="title-prod">Products</h1>
 
         <div class="products-container" id="productsContainer">
             {% for product in products %}
             <div class="product">
                 <div class="product-image">
-                    <img src="{{ product.image_path }}" alt="{{ product.name }}">
+                    <img src="{{ product.image_path }}" alt="{{ product.name }}" class="img-prod">
                 </div>
                 <div class="product-details">
-                    <h2>{{ product.name }}</h2>
-                    <p>Description: {{ product.description }}</p>
-                    <p>Price: ${{ product.price }}</p>
-                    <p>Inventory: {{ product.inventory }}</p>
-                    <p>Category: {{ product.category }}</p>
-                    <button class="add-to-cart-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+                    <h2 class="name-prod">{{ product.name }}</h2>
+                    <p class="desc-prod">{{ product.description }}</p>
+                    <p class="price-prod">${{ product.price }}</p>
+                    <p class="inv-prod">Stock : {{ product.inventory }}</p>
+                    <p class="category-prod">Category : {{ product.category }}</p>
+                    <button class="add-to-cart-btn btn-prod" data-product-id="{{ product.id }}">Add to Cart</button>
                 </div>
             </div>
             {% endfor %}
         </div>
     </section>
+
+
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -97,12 +102,15 @@
             });
         });
     </script>
-    <script src="https://kit.fontawesome.com/09c454a1ec.js" crossorigin="anonymous"></script>
+
 
 
     <footer>
-
+        © Tcho Kafew - Site réaliser par Othmane
     </footer>
+
+    <script src="https://kit.fontawesome.com/09c454a1ec.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 
 </html>

@@ -7,7 +7,7 @@ import mysql.connector
 import base64
 from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
-
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__, template_folder=os.path.abspath('templates'))
 app = Flask(__name__, static_url_path='/static')
@@ -207,6 +207,10 @@ def profile():
 @app.route('/manage')
 def manage_products():
     return render_template('manage.html')
+
+@app.route('/checkout')
+def checkout():
+    return render_template('checkout.html')
 
 
 # Adding a product to the database using the manage page
