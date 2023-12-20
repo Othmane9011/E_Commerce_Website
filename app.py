@@ -176,6 +176,7 @@ def login():
 
 
 @app.route('/index')
+@login_required
 def index():
     if 'logged_in' in session and session['logged_in']:
         user_id = session.get('user_id')
